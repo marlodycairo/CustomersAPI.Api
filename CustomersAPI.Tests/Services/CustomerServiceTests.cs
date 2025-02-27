@@ -166,12 +166,18 @@ namespace CustomersAPI.Tests.Services
                 .Returns(new TestAsyncEnumerator<Customer>(data.GetEnumerator()));
 
             var mockContext = new Mock<IAppDbContext>();
-            mockContext.Setup(c => c.Customers).Returns(mockSet.Object);
+                        mockContext.Setup(c => c.Customers).Returns(mockSet.Object);
 
-            var repository = new CustomerService(mockContext.Object);
+                        var repository = new CustomerService(mockContext.Object);
 
-            // Act
-            var entity = await repository.DeleteCustomer(1);
+                        // Act
+                        var entity = await repository.DeleteCustomer(1);
+
+            var primeraEntidad = await mockSet.Object.FirstOrDefaultAsync();
+            // Puedes realizar tus aserciones en la prueba sobre 'primeraEntidad'
+
+
+            
 
             // Assert
             Assert.True(entity);

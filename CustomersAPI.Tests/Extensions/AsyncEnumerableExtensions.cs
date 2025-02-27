@@ -106,9 +106,18 @@ namespace CustomersAPI.Tests.Extensions
 
         TResult IAsyncQueryProvider.ExecuteAsync<TResult>(Expression expression, CancellationToken cancellationToken)
         {
-            return ExecuteAsync<TResult>(expression, cancellationToken).GetAwaiter().GetResult();
-        }
+            var expectedResultType = typeof(TResult).GetGenericArguments()[0];
+            var executionResult = typeof(IQueryProvider)
+              .GetMethods()
+              .First(method => method.Name == nameof(IQueryProvider.Execute) && method.IsGenericMethod)
+              .MakeGenericMethod(expectedResultType)
+              .Invoke(this, new object[] { expression });
 
+
+            return (TResult)typeof(Task).GetMethod(nameof(Task.FromResult))
+                .MakeGenericMethod(expectedResultType)
+                .Invoke(null, new[] { executionResult });
+        }
     }
 }
 

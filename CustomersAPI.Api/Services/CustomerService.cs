@@ -25,7 +25,7 @@ namespace CustomersAPI.Api.Services
 
         public async Task<bool> DeleteCustomer(int id)
         {
-            var response = await _context.Customers.FirstOrDefaultAsync(x => x.Id == id);
+            var response = await _context.Customers.FirstOrDefaultAsync(x => x.Id == id, CancellationToken.None);
 
             if (response is null)
             {
@@ -41,7 +41,7 @@ namespace CustomersAPI.Api.Services
 
         public async Task<bool> EditCustomer(int id, Customer customer)
         {
-            var customerExisting = await _context.Customers.FirstOrDefaultAsync(x => x.Id == id && x.Id == customer.Id);
+            var customerExisting = await _context.Customers.FirstOrDefaultAsync(x => x.Id == id && x.Id == customer.Id, cancellationToken: default);
 
             if (customerExisting is null)
             {
