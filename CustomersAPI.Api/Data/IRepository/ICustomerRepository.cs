@@ -1,8 +1,8 @@
 ﻿using CustomersAPI.Api.Models;
 
-namespace CustomersAPI.Api.Services.IServices
+namespace CustomersAPI.Api.Data.IRepository
 {
-    public interface ICustomerService
+    public interface ICustomerRepository
     {
         public Task<List<Customer>> GetCustomersAsync();
         public Task<Customer> GetCustomerByIdAsync(int id);

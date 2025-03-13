@@ -1,13 +1,13 @@
-﻿using CustomersAPI.Api.Data;
+﻿using CustomersAPI.Api.Data.IRepository;
 using CustomersAPI.Api.Models;
 using CustomersAPI.Api.Services.IServices;
 using Microsoft.EntityFrameworkCore;
 
 namespace CustomersAPI.Api.Services
 {
-    public class CustomerService(IAppDbContext context) : ICustomerService
+    public class CustomerService(ICustomerRepository customerRepository) : ICustomerService
     {
-        private readonly IAppDbContext _context = context;
+        private readonly ICustomerRepository _customerRepository = customerRepository;
 
         public async Task<Customer> AddCustomerAsync(Customer customer)
         {
@@ -16,58 +16,57 @@ namespace CustomersAPI.Api.Services
                 return null;
             }
 
-            await _context.Customers.AddAsync(customer);
+            var response = await _customerRepository.AddCustomerAsync(customer);
 
-            await _context.SaveChangesAsync();
-
-            return customer;
+            return response;
         }
 
         public async Task<bool> DeleteCustomer(int id)
         {
-            var response = await _context.Customers.FirstOrDefaultAsync(x => x.Id == id, CancellationToken.None);
+            var response = await _customerRepository.DeleteCustomer(id);
 
-            if (response is null)
+            if (!response)
             {
                 return false;
             }
-
-            _context.Customers.Remove(response);
-
-            await _context.SaveChangesAsync();
-
-            return true;
+            
+            return response;
         }
 
         public async Task<bool> EditCustomer(int id, Customer customer)
         {
-            var customerExisting = await _context.Customers.FirstOrDefaultAsync(x => x.Id == id && x.Id == customer.Id, cancellationToken: default);
+            var response = await _customerRepository.EditCustomer(id, customer);
 
-            if (customerExisting is null)
+            if (!response)
             {
                 return false;
             }
 
-            customerExisting.Name = customer.Name;
-            customerExisting.PhoneNumber = customer.PhoneNumber;
-
-            //_context.Customers.Update(customer);
-
-            await _context.SaveChangesAsync();
-
-            return true;
+            return response;
         }
 
         public async Task<Customer> GetCustomerByIdAsync(int id)
         {
-            var response = await _context.Customers.FindAsync(id);
+            var response = await _customerRepository.GetCustomerByIdAsync(id);
+
+            if (response is null)
+            {
+                return null;
+            }
 
             return response;
         }
 
         public async Task<List<Customer>> GetCustomersAsync()
         {
-            var response = await _context.Customers.ToListAsync();
+            var response = await _customerRepository.GetCustomersAsync();
+
+            return response;
+        }
+
+        public async Task<List<Customer>> GetCustomersOrderDescending()
+        {
+            var response = await _customerRepository.GetCustomersOrderDescending();
 
             return response;
         }
